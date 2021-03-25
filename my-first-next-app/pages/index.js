@@ -1,25 +1,22 @@
-import { useState } from "react";
-import { useRouter } from "next/router";
+import fetch from "isomorphic-unfetch";
 
-const App = () => {
-  const router = useRouter();
-  const [name, setName] = useState("");
-  return (
-    <div>
-      <button type="button" onClick={() => router.push("/tomato")}>
-        tomato로 가기
-      </button>
-      <p>이름</p>
-      <input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        style={{ marginRight: "12px" }}
-      />
-      <button type="button" onClick={() => router.push(`/vegetable/${name}`)}>
-        {name}으로 가기
-      </button>
-    </div>
-  );
+const App = ({ user }) => {
+  const username = user && user.name;
+  return <div>{username}</div>;
+};
+
+export const getServerSideProps = async () => {
+  try {
+    const res = await fetch("https://api.github.com/users/jerrynim");
+    if (res.status === 200) {
+      const user = await res.json();
+      return { props: { user } };
+    }
+    return { props: {} };
+  } catch (e) {
+    console.log(e);
+    return { props: {} };
+  }
 };
 
 export default App;
